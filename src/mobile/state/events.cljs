@@ -6,7 +6,7 @@
 (reg-event-fx
   :initialize-db
   (fn [_ _]
-    {:db {:image-uri nil}}))
+    {:db {:image-uris []}}))
 
 (reg-event-fx
   :launch-camera
@@ -18,4 +18,4 @@
 (reg-event-fx
   :handle-image-capture
   (fn [{db :db} [_ uri]]
-    {:db (assoc db :image-uri uri)}))
+    {:db (update-in db [:image-uris] conj uri)}))
