@@ -1,7 +1,9 @@
 (ns mobile.views.home
   (:require
-    [re-frame.core :refer [dispatch subscribe]]
-    [mobile.interop.react-native :as rn]))
+    [reagent.core :as r]
+    [re-frame.core :refer [dispatch dispatch-sync subscribe]]
+    [mobile.interop.react-native :as rn]
+    [mobile.interop.expo :refer [keep-awake]]))
 
 (defn images-view [image-uris]
   [rn/view {:style {:flex 1
@@ -14,17 +16,50 @@
                         :height 100}}])])
 
 (defn take-image-button-view []
-  [rn/touchable-highlight
-   {:style {:background-color "#999"
-            :padding 10
-            :border-radius 5}
-    :on-press (fn []
-                (dispatch [:launch-camera]))}
-   [rn/text
-    {:style {:color "white"
-             :text-align "center"
-             :font-weight "bold"}}
-    "take photo"]])
+  [rn/button
+   {:on-press (fn []
+                (dispatch [:launch-camera]))
+    :title "Take Photo"}])
+
+(defn data-title-input-view [{:keys [label key return-key-type next-key]}]
+  [rn/view
+   {:style
+    {:flex 1
+     :flex-direction :column}}
+   [rn/text {} label]
+   [rn/text-input
+    {:ref (fn [node]
+            (when (and node @(subscribe [:focused? key]))
+              (.focus node)))
+     :value @(subscribe [:attribute key])
+     :style {:height 40}
+     :focus @(subscribe [:focused? key])
+     :return-key-type return-key-type
+     :on-submit-editing (fn []
+                          (dispatch [:focus-attribute next-key]))
+     :on-change-text (fn [text]
+                       (dispatch-sync [:set-attribute key text])
+                       (r/flush))}]])
+
+(defn data-entry-view []
+  [rn/keyboard-avoiding-view
+   {:style {:flex 1
+            :flex-direction "column"}}
+   [data-title-input-view
+    {:label "Title"
+     :key :title
+     :return-key-type "next"
+     :next-key :artist}]
+   [data-title-input-view
+    {:label "Artist"
+     :key :artist
+     :return-key-type "next"
+     :next-key :year}]
+   [data-title-input-view
+    {:label "Year"
+     :key :year
+     :return-key-type "done"
+     :next-key nil}]])
 
 (defn home-view []
   [rn/view
@@ -32,5 +67,16 @@
             :margin-top 24
             :flex-direction "column"
             :align-items "center"}}
+   [keep-awake]
    [images-view (reverse @(subscribe [:image-uris]))]
-   [take-image-button-view]])
+   [take-image-button-view]
+   [rn/keyboard-avoiding-view
+    {:behavior "padding"
+     :style {:flex 1
+             :flex-direction "column"
+             :padding 20
+             :width "100%"}}
+    [data-entry-view]
+    [rn/button
+     {:title "Submit"
+      :on-press (fn [])}]]])

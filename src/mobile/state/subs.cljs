@@ -6,3 +6,13 @@
   :image-uris
   (fn [db _]
     (db :image-uris)))
+
+(reg-sub
+  :attribute
+  (fn [db [_ key]]
+    (get-in db [:attributes key])))
+
+(reg-sub
+  :focused?
+  (fn [db [_ key]]
+    (= key (db :focused-attribute))))
