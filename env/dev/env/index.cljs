@@ -7,4 +7,4 @@
 (-> (js/require "figwheel-bridge")
     (.withModules #js {"expo" (js/require "expo"), "react-native" (js/require "react-native"), "react" (js/require "react"), "create-react-class" (js/require "create-react-class"), "./assets/icons/app.png" (js/require "../../../assets/icons/app.png"), "./assets/icons/loading.png" (js/require "../../../assets/icons/loading.png"), "./assets/images/cljs.png" (js/require "../../../assets/images/cljs.png")}
 )
-    (.start "main" "expo" "10.88.111.109"))
+    (.start "main" "expo" "192.168.0.13"))
