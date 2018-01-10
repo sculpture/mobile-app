@@ -79,4 +79,5 @@
     [data-entry-view]
     [rn/button
      {:title "Submit"
-      :on-press (fn [])}]]])
+      :on-press (fn []
+                  (dispatch [:submit]))}]]])
